@@ -10,12 +10,13 @@ Sonunda: gerçek bir web sayfası üretmiş, onu GitHub'a göndermiş olacaksın
 
 ```
 ymi484repo/
-├── README.md                  ← şu an okuduğun dosya
+├── README.md                       ← şu an okuduğun dosya
+├── SKILL-DOSYASI-REHBERI.md        ← skill dosyası nedir? kapsamlı rehber
 ├── skills/
-│   ├── web-deneyimi.md        ← hazır skill dosyası — ajanın okuyacağı talimatlar
-│   └── benim-skilim.md        ← boş iskelet — skill dosyası nasıl yazılır görmek için
+│   ├── web-deneyimi.md             ← hazır skill dosyası — ajanın okuyacağı talimatlar
+│   └── benim-skilim.md             ← boş iskelet — skill dosyası nasıl yazılır görmek için
 └── ornek/
-    └── index.html             ← örnek bir çıktı (ilham için bak)
+    └── index.html                  ← örnek bir çıktı (ilham için bak)
 ```
 
 Alıştırmanın sonunda klasörüne şu dosyalar eklenmiş olacak:
@@ -29,13 +30,13 @@ Alıştırmanın sonunda klasörüne şu dosyalar eklenmiş olacak:
 
 ## Skill Dosyası Nedir?
 
-`skills/web-deneyimi.md` dosyasını aç ve oku.
+> **Önce `SKILL-DOSYASI-REHBERI.md` dosyasını oku.** Skill dosyasının ne olduğunu, neden gerekli olduğunu ve her bölümünün ne işe yaradığını adım adım anlatan kapsamlı bir rehber hazırladık.
 
-Bu dosya bir **skill dosyasıdır** — yapay zeka ajanına ne yapacağını, nasıl davranacağını, neyi üretmesi gerektiğini anlatan yapılandırılmış bir talimat belgesi. Ajan bu dosyayı okuyarak ne yapması gerektiğini anlıyor.
+Kısaca: skill dosyası, yapay zeka ajanına ne yapacağını, nasıl davranacağını ve neyi üretmesi gerektiğini anlatan **yapılandırılmış bir talimat belgesidir**. Ajan bu dosyayı okuyarak ne yapması gerektiğini anlıyor. Skill dosyaları sayesinde aynı kalitede sonucu her seferinde, herkese tekrar edebilirsin.
 
-Skill dosyaları sayesinde aynı kalitede sonucu her seferinde, herkese tekrar edebilirsin.
-
-`skills/benim-skilim.md` dosyasına da bak — bu boş bir iskelet. Bir skill dosyasının hangi bölümlerden oluştuğunu görmek için oraya bakabilirsin. Bu alıştırmada onu doldurmak zorunda değilsin.
+Rehberi okuduktan sonra:
+- `skills/web-deneyimi.md` → hazır, çalışan bir skill dosyasını incelemek için
+- `skills/benim-skilim.md` → boş iskelet, bir skill dosyasının yapısını görmek için
 
 ---
 
