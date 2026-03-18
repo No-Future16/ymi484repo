@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VANTA — Karanlık Müzik Kolektifi</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0a0a;
+    --paper: #f0ece4;
+    --red: #c8341a;
+    --dim: #2a2a2a;
+    --mid: #555;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--red);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease;
+    mix-blend-mode: difference;
+  }
+
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(240,236,228,0.3);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.18s ease, width 0.2s ease, height 0.2s ease;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* ─── HERO ─── */
+  #hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2.5rem 3rem 3rem;
+    position: relative;
+    border-bottom: 1px solid var(--dim);
+  }
+
+  .hero-eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(6rem, 18vw, 18rem);
+    line-height: 0.88;
+    letter-spacing: -0.01em;
+    color: var(--paper);
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s ease 0.4s, transform 1s ease 0.4s;
+  }
+
+  .hero-title span {
+    color: var(--red);
+    display: inline-block;
+  }
+
+  .hero-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 2rem;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.8s ease 0.9s, transform 0.8s ease 0.9s;
+  }
+
+  .hero-desc {
+    font-size: 0.75rem;
+    line-height: 1.7;
+    color: var(--mid);
+    max-width: 280px;
+  }
+
+  .hero-year {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+
+  /* Vertical scrolling line */
+  .scroll-line {
+    position: absolute;
+    right: 3rem;
+    top: 3rem;
+    bottom: 3rem;
+    width: 1px;
+    background: var(--dim);
+    opacity: 0;
+    transition: opacity 0.8s ease 1.2s;
+  }
+
+  .scroll-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: 60px;
+    background: var(--red);
+    animation: lineDown 2.4s ease-in-out infinite;
+  }
+
+  @keyframes lineDown {
+    0% { top: 0; opacity: 1; }
+    80% { top: calc(100% - 60px); opacity: 1; }
+    100% { top: calc(100% - 60px); opacity: 0; }
+  }
+
+  /* ─── MARQUEE ─── */
+  .marquee-wrap {
+    overflow: hidden;
+    border-top: 1px solid var(--dim);
+    border-bottom: 1px solid var(--dim);
+    padding: 1rem 0;
+    background: var(--red);
+  }
+
+  .marquee-track {
+    display: flex;
+    gap: 3rem;
+    animation: marquee 18s linear infinite;
+    white-space: nowrap;
+  }
+
+  .marquee-item {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+  }
+
+  .marquee-item::after {
+    content: '◆';
+    font-size: 0.5rem;
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ─── SECTIONS ─── */
+  section {
+    padding: 6rem 3rem;
+    border-bottom: 1px solid var(--dim);
+  }
+
+  .section-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 3rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-label::before {
+    content: '';
+    display: block;
+    width: 2rem;
+    height: 1px;
+    background: var(--red);
+  }
+
+  /* ─── RELEASES ─── */
+  .releases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--dim);
+  }
+
+  .release-card {
+    background: var(--ink);
+    padding: 2.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease, background 0.3s ease;
+  }
+
+  .release-card:hover {
+    background: var(--dim);
+  }
+
+  .release-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .release-num {
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    color: var(--mid);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  .release-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    line-height: 1;
+    color: var(--paper);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.02em;
+  }
+
+  .release-sub {
+    font-size: 0.7rem;
+    color: var(--mid);
+    font-style: italic;
+    margin-bottom: 2rem;
+  }
+
+  .release-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tag {
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: 1px solid var(--dim);
+    padding: 0.3rem 0.7rem;
+    color: var(--mid);
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .release-card:hover .tag {
+    border-color: var(--red);
+    color: var(--paper);
+  }
+
+  /* ─── MANIFESTO ─── */
+  #manifesto {
+    max-width: 720px;
+  }
+
+  .manifesto-text {
+    font-size: clamp(1.2rem, 2.5vw, 2rem);
+    line-height: 1.5;
+    color: var(--paper);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+
+  .manifesto-text.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .manifesto-text em {
+    color: var(--red);
+    font-style: normal;
+  }
+
+  /* ─── SHOWS ─── */
+  .shows-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .show-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 1fr auto;
+    align-items: center;
+    gap: 2rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--dim);
+    opacity: 0;
+    transform: translateX(-16px);
+    transition: opacity 0.6s ease, transform 0.6s ease, background 0.2s;
+  }
+
+  .show-row:hover {
+    padding-left: 1rem;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .show-row.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .show-date {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--red);
+  }
+
+  .show-venue {
+    font-size: 0.9rem;
+    color: var(--paper);
+  }
+
+  .show-city {
+    font-size: 0.7rem;
+    color: var(--mid);
+    font-style: italic;
+  }
+
+  .show-ticket {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border: 1px solid var(--dim);
+    padding: 0.5rem 1rem;
+    color: var(--mid);
+    cursor: none;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+
+  .show-ticket:hover {
+    border-color: var(--paper);
+    color: var(--ink);
+    background: var(--paper);
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    padding: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.05em;
+    color: var(--paper);
+  }
+
+  .footer-logo span { color: var(--red); }
+
+  .footer-copy {
+    font-size: 0.6rem;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+  }
+
+  /* ─── REVEALED class ─── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 640px) {
+    #hero { padding: 2rem 1.5rem 2.5rem; }
+    section { padding: 4rem 1.5rem; }
+    .show-row { grid-template-columns: 1fr; gap: 0.5rem; }
+    .show-ticket { display: none; }
+    footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="scroll-line"></div>
+  <p class="hero-eyebrow">İstanbul Müzik Kolektifi — Est. 2019</p>
+  <h1 class="hero-title">VAN<span>T</span>A</h1>
+  <div class="hero-meta">
+    <p class="hero-desc">Karanlığı ses diliyle belgeleyen bağımsız bir kolektif. Deneysel, ham ve dürüst.</p>
+    <span class="hero-year">MMX X I X →</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track" id="marquee">
+    <span class="marquee-item">Yeni Albüm</span>
+    <span class="marquee-item">NOKTA — Mart 2025</span>
+    <span class="marquee-item">Canlı Performans</span>
+    <span class="marquee-item">Borusan Müzik Evi</span>
+    <span class="marquee-item">Yeni Albüm</span>
+    <span class="marquee-item">NOKTA — Mart 2025</span>
+    <span class="marquee-item">Canlı Performans</span>
+    <span class="marquee-item">Borusan Müzik Evi</span>
+    <span class="marquee-item">Yeni Albüm</span>
+    <span class="marquee-item">NOKTA — Mart 2025</span>
+    <span class="marquee-item">Canlı Performans</span>
+    <span class="marquee-item">Borusan Müzik Evi</span>
+  </div>
+</div>
+
+<!-- RELEASES -->
+<section id="releases">
+  <p class="section-label">Diskografi</p>
+  <div class="releases-grid">
+    <div class="release-card">
+      <p class="release-num">001 / 2019</p>
+      <h2 class="release-title">Boşluk</h2>
+      <p class="release-sub">İlk EP — 4 parça</p>
+      <div class="release-tags">
+        <span class="tag">Ambient</span>
+        <span class="tag">Deneysel</span>
+        <span class="tag">Enstrümantal</span>
+      </div>
+    </div>
+    <div class="release-card" style="transition-delay:0.1s">
+      <p class="release-num">002 / 2021</p>
+      <h2 class="release-title">Kırık</h2>
+      <p class="release-sub">Albüm — 9 parça</p>
+      <div class="release-tags">
+        <span class="tag">Post-Rock</span>
+        <span class="tag">Noise</span>
+        <span class="tag">Elektronik</span>
+      </div>
+    </div>
+    <div class="release-card" style="transition-delay:0.2s">
+      <p class="release-num">003 / 2025</p>
+      <h2 class="release-title">Nokta</h2>
+      <p class="release-sub">Albüm — 11 parça</p>
+      <div class="release-tags">
+        <span class="tag">Drone</span>
+        <span class="tag">Minimal</span>
+        <span class="tag">Vokal</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<section id="manifesto">
+  <p class="section-label">Manifesto</p>
+  <p class="manifesto-text">
+    Müzik, konfor için değil <em>hakikat</em> için var. Biz ses yapmıyoruz — <em>sessizliği</em> kesiyoruz. Her nota bir itiraf, her duraklama bir soru işareti.
+  </p>
+</section>
+
+<!-- SHOWS -->
+<section id="shows">
+  <p class="section-label">Gösteriler</p>
+  <div class="shows-list">
+    <div class="show-row">
+      <span class="show-date">14 Mart 2025</span>
+      <span class="show-venue">Borusan Müzik Evi</span>
+      <span class="show-city">İstanbul, TR</span>
+      <span class="show-ticket">Bilet Al</span>
+    </div>
+    <div class="show-row" style="transition-delay:0.1s">
+      <span class="show-date">28 Mart 2025</span>
+      <span class="show-venue">Arkaoda</span>
+      <span class="show-city">İstanbul, TR</span>
+      <span class="show-ticket">Bilet Al</span>
+    </div>
+    <div class="show-row" style="transition-delay:0.2s">
+      <span class="show-date">12 Nisan 2025</span>
+      <span class="show-venue">Bilkent Odeon</span>
+      <span class="show-city">Ankara, TR</span>
+      <span class="show-ticket">Bilet Al</span>
+    </div>
+    <div class="show-row" style="transition-delay:0.3s">
+      <span class="show-date">3 Mayıs 2025</span>
+      <span class="show-venue">Zorlu PSM</span>
+      <span class="show-city">İstanbul, TR</span>
+      <span class="show-ticket">Bilet Al</span>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">VAN<span>T</span>A</div>
+  <p class="footer-copy">© 2025 Vanta Kolektif — Tüm hakları saklıdır</p>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  (function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) *.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  })();
+
+  // Hero entrance
+  window.addEventListener('load', () => {
+    document.querySelector('.hero-eyebrow').style.opacity = 1;
+    document.querySelector('.hero-eyebrow').style.transform = 'translateY(0)';
+    document.querySelector('.hero-title').style.opacity = 1;
+    document.querySelector('.hero-title').style.transform = 'translateY(0)';
+    document.querySelector('.hero-meta').style.opacity = 1;
+    document.querySelector('.hero-meta').style.transform = 'translateY(0)';
+    document.querySelector('.scroll-line').style.opacity = 1;
+  });
+
+  // Scroll reveals
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll(
+    '.release-card, .show-row, .manifesto-text, .reveal'
+  ).forEach(el => observer.observe(el));
+
+  // Marquee duplication safety
+  const track = document.getElementById('marquee');
+  track.innerHTML += track.innerHTML;
+</script>
+</body>
+</html>
